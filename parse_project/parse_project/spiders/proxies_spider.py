@@ -22,8 +22,6 @@ class ProxiesSpider(scrapy.Spider):
         for proxy in response.selector.css('table.hma-table tbody tr'):
             item = dict()
 
-            item['port'] = proxy.css('td')[2].xpath('text()').extract()[0].strip()
-
             dirty_elements = proxy.css('td')[1].css('span style::text').extract()[0].split()
             inline_elements = list(filter(lambda s: 'none' not in s, dirty_elements))
             clear_elements = list(map(lambda s: s.split('{')[0][1:], inline_elements))
@@ -36,7 +34,7 @@ class ProxiesSpider(scrapy.Spider):
             garbage = spans_garbage[:1]
 
             item['ip'] = get_ip(garbage, span, div, clear_elements)
-            item['clear_elements'] = clear_elements
+            item['port'] = proxy.css('td')[2].xpath('text()').extract()[0].strip()
 
             yield item
 
