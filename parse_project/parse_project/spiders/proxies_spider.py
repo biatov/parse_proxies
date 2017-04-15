@@ -1,4 +1,5 @@
 import scrapy
+from parse_project.search import get_ip
 
 
 class ProxiesSpider(scrapy.Spider):
@@ -19,12 +20,18 @@ class ProxiesSpider(scrapy.Spider):
 
             item['port'] = proxy.css('td')[2].xpath('text()').extract()[0].strip()
 
-            item['dirty_elements'] = proxy.css('td')[1].css('span style::text').extract()[0].split()
-            item['inline_elements'] = list(filter(lambda s: 'none' not in s, item['dirty_elements']))
-            item['clear_elements'] = list(map(lambda s: s.split('{')[0][1:], item['inline_elements']))
+            dirty_elements = proxy.css('td')[1].css('span style::text').extract()[0].split()
+            inline_elements = list(filter(lambda s: 'none' not in s, dirty_elements))
+            clear_elements = list(map(lambda s: s.split('{')[0][1:], inline_elements))
 
-            item['spans_garbage'] = proxy.css('td')[1].css('span').extract()
-            item['divs'] = proxy.css('td')[1].css('span div').extract()
+            spans_garbage = proxy.css('td')[1].css('span').extract()
+            divs = proxy.css('td')[1].css('span div').extract()
+
+            div = divs
+            span = spans_garbage[1:]
+            garbage = spans_garbage[:1]
+
+            item['ip'] = get_ip(garbage, span, div, clear_elements)
 
             yield item
 
