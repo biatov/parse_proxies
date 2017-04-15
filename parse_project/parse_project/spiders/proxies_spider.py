@@ -14,7 +14,7 @@ class ProxiesSpider(scrapy.Spider):
         with open(filename, 'wb') as f:
             f.write(response.body)
 
-        for proxy in response.selector.css('tbody tr'):
+        for proxy in response.selector.css('table.hma-table tbody tr'):
             item = dict()
 
             item['port'] = proxy.css('td')[2].xpath('text()').extract()[0].strip()
@@ -23,6 +23,8 @@ class ProxiesSpider(scrapy.Spider):
             item['inline_elements'] = list(filter(lambda s: 'none' not in s, item['dirty_elements']))
             item['clear_elements'] = list(map(lambda s: s.split('{')[0][1:], item['inline_elements']))
 
-            item['a'] = proxy.css('td')[1].css('span').extract()
+            item['spans_garbage'] = proxy.css('td')[1].css('span').extract()
+            item['divs'] = proxy.css('td')[1].css('span div').extract()
 
             yield item
+

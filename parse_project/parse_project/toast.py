@@ -1,28 +1,127 @@
 import re
-# initial = ["<span>\n          <style>\n.uqsI{display:none}\n.EYZQ{display:inline}\n</style><span style=\"display:none\">110</span><span class=\"uqsI\">110</span><span></span>115<span style=\"display:none\">193</span><div style=\"display:none\">193</div><span class=\"91\">.</span><span class=\"EYZQ\">29</span><span style=\"display:none\">143</span><div style=\"display:none\">143</div><span class=\"uqsI\">246</span><div style=\"display:none\">246</div><span class=\"EYZQ\">.</span><span class=\"EYZQ\">76</span><span></span><span class=\"EYZQ\">.</span>112        </span>", "<span style=\"display:none\">110</span>", "<span class=\"uqsI\">110</span>", "<span></span>", "<span style=\"display:none\">193</span>", "<span class=\"91\">.</span>", "<span class=\"EYZQ\">29</span>", "<span style=\"display:none\">143</span>", "<span class=\"uqsI\">246</span>", "<span class=\"EYZQ\">.</span>", "<span class=\"EYZQ\">76</span>", "<span></span>", "<span class=\"EYZQ\">.</span>"]
-initial = ["<span>\n          <style>\n.mcRt{display:none}\n.mBUR{display:inline}\n</style><span class=\"mBUR\">200</span>.<span class=\"mBUR\">29</span><span></span><span class=\"mcRt\">247</span><div style=\"display:none\">247</div><span class=\"20\">.</span><span class=\"mcRt\">14</span><span></span><span class=\"mcRt\">83</span><div style=\"display:none\">83</div>191<span style=\"display: inline\">.</span><span style=\"display:none\">75</span><div style=\"display:none\">75</div><span class=\"91\">149</span>        </span>", "<span class=\"mBUR\">200</span>", "<span class=\"mBUR\">29</span>", "<span></span>", "<span class=\"mcRt\">247</span>", "<span class=\"20\">.</span>", "<span class=\"mcRt\">14</span>", "<span></span>", "<span class=\"mcRt\">83</span>", "<span style=\"display: inline\">.</span>", "<span style=\"display:none\">75</span>", "<span class=\"91\">149</span>"]
-# success = ["EYZQ"]
-success = ["mBUR"]
-gotentag = list(filter(lambda x: 'none' not in x, initial[:1][0].split()))
-dirty_ip = []
-for visible in success:
-    for init in gotentag:
-        print(init)
+
+spans_garbage = ["<span>\n          <style>\n.e9nG{display:none}\n.t6Xf{display:inline}\n.depz{display:none}\n.h2-A{display:inline}\n.r1V4{display:none}\n.DYhW{display:inline}\n</style><span class=\"e9nG\">43</span><span class=\"r1V4\">51</span><span class=\"67\">88</span><div style=\"display:none\">127</div>.<span style=\"display:none\">16</span><span class=\"r1V4\">16</span><span style=\"display:none\">46</span><span class=\"r1V4\">46</span><span></span><span style=\"display:none\">61</span><div style=\"display:none\">61</div><span style=\"display: inline\">80</span><span style=\"display:none\">96</span><div style=\"display:none\">96</div><div style=\"display:none\">117</div><div style=\"display:none\">168</div><span style=\"display:none\">185</span><span class=\"depz\">185</span><div style=\"display:none\">185</div><span></span><span class=\"e9nG\">200</span><span></span><span class=\"depz\">224</span><span></span><span class=\"44\">.</span><span style=\"display: inline\">113</span><span class=\"e9nG\">159</span><span style=\"display:none\">186</span><div style=\"display:none\">186</div><span style=\"display:none\">201</span><span class=\"e9nG\">201</span>.<span></span>9<span class=\"depz\">23</span><span></span><span style=\"display:none\">53</span><span style=\"display:none\">76</span><div style=\"display:none\">76</div><span style=\"display:none\">115</span><span class=\"e9nG\">115</span><div style=\"display:none\">115</div><span style=\"display:none\">140</span><span class=\"depz\">140</span><div style=\"display:none\">140</div><span style=\"display:none\">145</span><span class=\"r1V4\">145</span><span></span><div style=\"display:none\">179</div><span class=\"r1V4\">189</span><div style=\"display:none\">189</div>        </span>", "<span class=\"e9nG\">43</span>", "<span class=\"r1V4\">51</span>", "<span class=\"67\">88</span>", "<span style=\"display:none\">16</span>", "<span class=\"r1V4\">16</span>", "<span style=\"display:none\">46</span>", "<span class=\"r1V4\">46</span>", "<span></span>", "<span style=\"display:none\">61</span>", "<span style=\"display: inline\">80</span>", "<span style=\"display:none\">96</span>", "<span style=\"display:none\">185</span>", "<span class=\"depz\">185</span>", "<span></span>", "<span class=\"e9nG\">200</span>", "<span></span>", "<span class=\"depz\">224</span>", "<span></span>", "<span class=\"44\">.</span>", "<span style=\"display: inline\">113</span>", "<span class=\"e9nG\">159</span>", "<span style=\"display:none\">186</span>", "<span style=\"display:none\">201</span>", "<span class=\"e9nG\">201</span>", "<span></span>", "<span class=\"depz\">23</span>", "<span></span>", "<span style=\"display:none\">53</span>", "<span style=\"display:none\">76</span>", "<span style=\"display:none\">115</span>", "<span class=\"e9nG\">115</span>", "<span style=\"display:none\">140</span>", "<span class=\"depz\">140</span>", "<span style=\"display:none\">145</span>", "<span class=\"r1V4\">145</span>", "<span></span>", "<span class=\"r1V4\">189</span>"]
+divs = ["<div style=\"display:none\">127</div>", "<div style=\"display:none\">61</div>", "<div style=\"display:none\">96</div>", "<div style=\"display:none\">117</div>", "<div style=\"display:none\">168</div>", "<div style=\"display:none\">185</div>", "<div style=\"display:none\">186</div>", "<div style=\"display:none\">76</div>", "<div style=\"display:none\">115</div>", "<div style=\"display:none\">140</div>", "<div style=\"display:none\">179</div>", "<div style=\"display:none\">189</div>"]
+clear_elements = ["t6Xf", "h2-A", "DYhW"]
+
+div = divs
+span = spans_garbage[1:]
+garbage = spans_garbage[:1]
+
+
+def get_unnecessary_elements(tag):
+    """
+    Find unnecessary element of tags. There are the same.
+    """
+    tag_list = list(filter(lambda e: 'none' not in e, tag))
+
+    garbage_full = list()
+
+    for each_tag in tag_list:
+        split_tag = each_tag.split('"')
         try:
-            if (visible in init) or ("display: inline" in init) or (re.search(r'[0-9.]+', init.split('>')[0])) and (init not in dirty_ip):
-                dirty_ip.append(init)
-            elif re.search(r'\.', init.split('>')[1]):
-                # print(init.split('>')[1])
-                # print('========')
-                dirty_ip.append(init)
+            clear_tag = split_tag[1]
+            if clear_tag in clear_elements or 'inline' in clear_tag or re.search(r'^\d+$', clear_tag):
+                pass
+            else:
+                garbage_full.append(each_tag)
         except IndexError:
-            pass
-ip = []
-for part in dirty_ip:
+            garbage_full.append(each_tag)
+    return garbage_full
+
+
+def clear_tags(tag):
+    """
+    Clearing the tag list from replays.
+    """
+    if tag:
+        c_tag = list(set(get_unnecessary_elements(tag)))
+    else:
+        c_tag = get_unnecessary_elements(tag)
+    return c_tag
+
+
+def get_amount_tags(un_span, un_div):
+    """
+    Merge two tag lists of tags without replace.
+    """
+    span = get_unnecessary_elements(un_span)
+    div = get_unnecessary_elements(un_div)
+    if span and div:
+        amount = clear_tags(span).extend(clear_tags(div))
+    elif span and (not div):
+        amount = clear_tags(span)
+    elif (not span) and div:
+        amount = clear_tags(div)
+    else:
+        amount = list()
+    return amount
+
+
+def without_style_garb(garb):
+    """
+    Getting garbage without style
+    """
     try:
-        ip_real = part.split('>')[1].split('<')[0].strip()
-        ip.append(ip_real)
-        # print(part.split('>'))
+        new_garbage = garb[0].split('</style>')[1]
     except IndexError:
-        pass
-print(list(filter(None, ip)))
+        new_garbage = garb
+    return new_garbage
+
+
+def split_garbage(garb):
+    """
+    Garbage collection by regular expression
+    For example: "n>.</s" or "v>34</d" or "v></s"
+    """
+    unnecessary_tags = get_amount_tags(span, div)
+
+    split_garb = re.split(r'(\w>[0-9.]*<\w)', without_style_garb(garb))
+
+    if unnecessary_tags:
+        for each in unnecessary_tags:
+            try:
+                split_garb.remove(each)
+            except ValueError:
+                pass
+    return split_garb
+
+
+def split_ip_data(clear_elem):
+    """
+    Get ip with html tags
+    """
+    getting_content = list()
+
+    for each_attr in clear_elem:
+        for each_garb in split_garbage(garbage):
+            try:
+                if (re.search(r'^[0-9]+$', each_garb.split('"')[1])) and (not re.search(r'\.', each_garb)) and (each_garb not in getting_content):
+                    getting_content.append(each_garb)
+            except IndexError:
+                pass
+            finally:
+                if (each_attr in each_garb or 'inline' in each_garb or re.search(r'\w>[0-9]+<\w', each_garb)) and (each_garb not in getting_content) and (not re.search(r'\.', each_garb)):
+                    getting_content.append(each_garb)
+                else:
+                    pass
+    return getting_content
+
+
+def get_ip():
+    """
+    Finally part.Get IP.
+    """
+    cont_ip = list(map(lambda e: re.split(r'(>[0-9.]*<)', e), split_ip_data(clear_elements)))
+
+    all_part_ip = list()
+
+    for i in cont_ip:
+        ip_part = i[1].replace('>', '').replace('<', '')
+        all_part_ip.append(ip_part)
+
+    ip = '.'.join(all_part_ip)
+    return ip
+
+# 200.29.191.149
+# 88.80.113.9
