@@ -85,15 +85,31 @@ def split_ip_data(garbage, span, div, clear_elem):
     """
     getting_content = list()
 
-    for each_attr in clear_elem:
-        for each_garb in split_garbage(garbage, span, div, clear_elem):
+    for each_garb in split_garbage(garbage, span, div, clear_elem):
+        for each_attr in clear_elem:
             try:
                 if (re.search(r'^[0-9]+$', each_garb.split('"')[1])) and (not re.search(r'\.', each_garb)) and (each_garb not in getting_content):
                     getting_content.append(each_garb)
             except IndexError:
                 pass
             finally:
-                if (each_attr in each_garb or 'inline' in each_garb or re.search(r'\w>[0-9]+<\w', each_garb)) and (each_garb not in getting_content) and (not re.search(r'\.', each_garb)):
+                if (each_attr in each_garb or 'inline' in each_garb or re.search(r'\w>\.*[0-9]+\.*<\w', each_garb)) and (each_garb not in getting_content) and (not re.search(r'\.', each_garb)):
+                    getting_content.append(each_garb)
+                elif (re.search(r'\w>\.*[0-9]+\.*', each_garb)) and (each_garb not in getting_content):
+                    getting_content.append(each_garb)
+                elif (re.search(r'^\s*\.*[0-9]+\.*<\w', each_garb)) and (each_garb not in getting_content):
+                    getting_content.append(each_garb)
+                elif (re.search(r'\s*\.*[0-9]+\.*\s*$', each_garb)) and (each_garb not in getting_content):
+                    getting_content.append(each_garb)
+                elif (re.search(r'^\s*\.*[0-9]+\.*\s*$', each_garb)) and (each_garb not in getting_content):
+                    getting_content.append(each_garb)
+                elif (re.search(r'^\s\.*[0-9]+\.*\s*', each_garb)) and (each_garb not in getting_content):
+                    getting_content.append(each_garb)
+                elif (re.search(r'\s*\.*[0-9]+\.*\s', each_garb)) and (each_garb not in getting_content):
+                    getting_content.append(each_garb)
+                elif (re.search(r'\s\.*[0-9]+\.*\s*$', each_garb)) and (each_garb not in getting_content):
+                    getting_content.append(each_garb)
+                elif (re.search(r'\s*\.*[0-9]+\.*\s$', each_garb)) and (each_garb not in getting_content):
                     getting_content.append(each_garb)
                 else:
                     pass
@@ -109,7 +125,7 @@ def get_ip(garbage, span, div, clear_elem):
     all_part_ip = list()
 
     for i in cont_ip:
-        ip_part = i[1].replace('>', '').replace('<', '')
+        ip_part = i[1].replace('>', '').replace('<', '').replace('.', '')
         all_part_ip.append(ip_part)
 
     ip = '.'.join(all_part_ip)

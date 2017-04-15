@@ -1,12 +1,16 @@
 import scrapy
+
 from parse_project.search import get_ip
 
 
 class ProxiesSpider(scrapy.Spider):
     name = "proxies"
+
+    allowed_domains = ['http://proxylist.hidemyass.com/']
     start_urls = [
-        'http://proxylist.hidemyass.com/',
+        'http://proxylist.hidemyass.com/1#listable',
     ]
+
 
     def parse(self, response):
 
@@ -32,6 +36,7 @@ class ProxiesSpider(scrapy.Spider):
             garbage = spans_garbage[:1]
 
             item['ip'] = get_ip(garbage, span, div, clear_elements)
+            item['clear_elements'] = clear_elements
 
             yield item
 
