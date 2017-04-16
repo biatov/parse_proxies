@@ -1,6 +1,6 @@
 import scrapy
 
-from parse_project.search import get_ip
+from parse_project.search import get_ip, without_style_garb
 
 
 class ProxiesSpider(scrapy.Spider):
@@ -10,7 +10,6 @@ class ProxiesSpider(scrapy.Spider):
     start_urls = [
         'http://proxylist.hidemyass.com/1#listable',
     ]
-
 
     def parse(self, response):
 
@@ -27,9 +26,8 @@ class ProxiesSpider(scrapy.Spider):
             clear_elements = list(map(lambda s: s.split('{')[0][1:], inline_elements))
 
             spans_garbage = proxy.css('td')[1].css('span').extract()
-            divs = proxy.css('td')[1].css('span div').extract()
 
-            div = divs
+            div = proxy.css('td')[1].css('span div').extract()
             span = spans_garbage[1:]
             garbage = spans_garbage[:1]
 

@@ -1,4 +1,5 @@
 import re
+from functools import reduce
 
 
 def get_unnecessary_elements(tag, clear_elem):
@@ -55,7 +56,9 @@ def without_style_garb(garb):
     Getting garbage without style
     """
     try:
-        new_garbage = garb[0].split('</style>')[1]
+        new_garbage = 's>%s' % garb[0].split('</style>')[1]
+        cut = len(new_garbage) - len('</span>')
+        new_garbage = '%s<s' % new_garbage[:cut].strip()
     except IndexError:
         new_garbage = garb
     return new_garbage
@@ -68,7 +71,7 @@ def split_garbage(garb, span, div, clear_elem):
     """
     unnecessary_tags = get_amount_tags(span, div, clear_elem)
 
-    split_garb = re.split(r'(\w>[0-9.]*<\w)', without_style_garb(garb))
+    split_garb = re.split(r'(\w>([\d.]*)*<\w)', without_style_garb(garb))  # split 192.168.1.1
 
     if unnecessary_tags:
         for each in unnecessary_tags:
@@ -88,28 +91,24 @@ def split_ip_data(garbage, span, div, clear_elem):
     for each_garb in split_garbage(garbage, span, div, clear_elem):
         for each_attr in clear_elem:
             try:
-                if (re.search(r'^[0-9]+$', each_garb.split('"')[1])) and (not re.search(r'\.', each_garb)) and (each_garb not in getting_content):
+                if (re.search(r'^\d+$', each_garb.split('"')[1])) and (not re.search(r'\.', each_garb)) and (each_garb not in getting_content):
                     getting_content.append(each_garb)
             except IndexError:
                 pass
             finally:
-                if (each_attr in each_garb or 'inline' in each_garb or re.search(r'\w>\.*[0-9]+\.*<\w', each_garb)) and (each_garb not in getting_content) and (not re.search(r'\.', each_garb)):
+                if (each_attr in each_garb or 'inline' in each_garb or re.search(r'\w>\.*\d+\.*<\w', each_garb)) and (each_garb not in getting_content) and (not re.search(r'\.', each_garb)):
                     getting_content.append(each_garb)
-                elif (re.search(r'\w>\.*[0-9]+\.*', each_garb)) and (each_garb not in getting_content):
+                elif (re.search(r'\w>\.*\d+\.*', each_garb)) and (each_garb not in getting_content):
                     getting_content.append(each_garb)
-                elif (re.search(r'^\s*\.*[0-9]+\.*<\w', each_garb)) and (each_garb not in getting_content):
+                elif (re.search(r'^\s*\.*\d+\.*<\w', each_garb)) and (each_garb not in getting_content):
                     getting_content.append(each_garb)
-                elif (re.search(r'\s*\.*[0-9]+\.*\s*$', each_garb)) and (each_garb not in getting_content):
+                elif (re.search(r'\s*\.*\d+\.*\s*$', each_garb)) and (each_garb not in getting_content):
                     getting_content.append(each_garb)
-                elif (re.search(r'^\s*\.*[0-9]+\.*\s*$', each_garb)) and (each_garb not in getting_content):
+                elif (re.search(r'^\s*\.*\d+\.*\s*$', each_garb)) and (each_garb not in getting_content):
                     getting_content.append(each_garb)
-                elif (re.search(r'^\s\.*[0-9]+\.*\s*', each_garb)) and (each_garb not in getting_content):
+                elif (re.search(r'^\s*\.*\d+\.*\s*', each_garb)) and (each_garb not in getting_content):
                     getting_content.append(each_garb)
-                elif (re.search(r'\s*\.*[0-9]+\.*\s', each_garb)) and (each_garb not in getting_content):
-                    getting_content.append(each_garb)
-                elif (re.search(r'\s\.*[0-9]+\.*\s*$', each_garb)) and (each_garb not in getting_content):
-                    getting_content.append(each_garb)
-                elif (re.search(r'\s*\.*[0-9]+\.*\s$', each_garb)) and (each_garb not in getting_content):
+                elif (re.search(r'\s*\.*\d+\.*\s', each_garb)) and (each_garb not in getting_content):
                     getting_content.append(each_garb)
                 else:
                     pass
@@ -118,15 +117,19 @@ def split_ip_data(garbage, span, div, clear_elem):
 
 def get_ip(garbage, span, div, clear_elem):
     """
-    Finally part.Get IP.
+    Finally part. Get ip even when the code is next:
+    <span ...>192.168</span>
+    or
+    <div ...>192.168.1.1</div>
     """
-    cont_ip = list(map(lambda e: re.split(r'(>[0-9.]*<)', e), split_ip_data(garbage, span, div, clear_elem)))
-
+    cont_ip = list(map(lambda e: re.split(r'(>([0-9.]*)*<)', e), split_ip_data(garbage, span, div, clear_elem)))
     all_part_ip = list()
 
-    for i in cont_ip:
-        ip_part = i[1].replace('>', '').replace('<', '').replace('.', '')
-        all_part_ip.append(ip_part)
+    for ip_part in cont_ip:
+        all_part_ip.append(ip_part[1])
 
-    ip = '.'.join(all_part_ip)
+    list_ip_vs_sym = list(map(lambda e: re.split(r'[><.]+', e), all_part_ip))
+    clear_ip = list(filter(None, reduce(lambda x, y: x + y, list_ip_vs_sym)))
+
+    ip = '.'.join(clear_ip)
     return ip
