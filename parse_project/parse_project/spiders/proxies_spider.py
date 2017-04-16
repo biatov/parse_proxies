@@ -27,9 +27,9 @@ class ProxiesSpider(scrapy.Spider):
 
             spans_garbage = proxy.css('td')[1].css('span').extract()
 
-            div = proxy.css('td')[1].css('span div').extract()
-            span = spans_garbage[1:]
-            garbage = spans_garbage[:1]
+            div = proxy.css('td')[1].css('span div').extract()  # [<div...>...</div>...</div>]
+            span = spans_garbage[1:]  # [<span...>...</span>...</span>]
+            garbage = spans_garbage[:1]  # [<style>...<span>...<div>]
 
             item['ip'] = get_ip(garbage, span, div, clear_elements)
             item['port'] = proxy.css('td')[2].xpath('text()').extract()[0].strip()

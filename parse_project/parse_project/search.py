@@ -91,7 +91,7 @@ def split_ip_data(garbage, span, div, clear_elem):
     for each_garb in split_garbage(garbage, span, div, clear_elem):
         for each_attr in clear_elem:
             try:
-                if (re.search(r'^\d+$', each_garb.split('"')[1])) and (not re.search(r'\.', each_garb)) and (each_garb not in getting_content):
+                if (('inline' in each_garb) or (re.search(r'^\d+$', each_garb.split('"')[1])) and (not re.search(r'\.', each_garb))) and (each_garb not in getting_content):
                     getting_content.append(each_garb)
             except IndexError:
                 pass
