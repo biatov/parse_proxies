@@ -52,6 +52,10 @@ ROBOTSTXT_OBEY = True
 
 # Enable or disable downloader middlewares
 # See http://scrapy.readthedocs.org/en/latest/topics/downloader-middleware.html
+DOWNLOADER_MIDDLEWARES = {
+        'scrapy.downloadermiddleware.useragent.UserAgentMiddleware': None,
+        'parse_project.comm.rotate_useragent.RotateUserAgentMiddleware': 400
+    }
 #DOWNLOADER_MIDDLEWARES = {
 #    'parse_project.middlewares.MyCustomDownloaderMiddleware': 543,
 #}
