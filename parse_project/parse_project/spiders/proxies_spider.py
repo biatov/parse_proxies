@@ -1,8 +1,8 @@
 import scrapy
 
-from parse_project.search import get_ip, without_style_garb
-from parse_project.items import ParseProjectItem
-from parse_project.pipelines import ParseProjectPipeline
+from ..search import get_ip
+from ..items import ParseProjectItem
+from ..pipelines import ParseProjectPipeline
 
 
 class ProxiesSpider(scrapy.Spider):
