@@ -96,19 +96,13 @@ def split_ip_data(garbage, span, div, clear_elem):
             except IndexError:
                 pass
             finally:
-                if (each_attr in each_garb or 'inline' in each_garb or re.search(r'\w>\.*\d+\.*<\w', each_garb)) and (each_garb not in getting_content) and (not re.search(r'\.', each_garb)):
+                if (each_attr in each_garb or re.search(r'\w>(\.*\d+\.*)*<\w', each_garb)) and (each_garb not in getting_content) and (not re.search(r'\.', each_garb)):
                     getting_content.append(each_garb)
-                elif (re.search(r'\w>\.*\d+\.*', each_garb)) and (each_garb not in getting_content):
+                elif (re.search(r'\w>(\.*\d+\.*)*', each_garb)) and (each_garb not in getting_content):
                     getting_content.append(each_garb)
-                elif (re.search(r'^\s*\.*\d+\.*<\w', each_garb)) and (each_garb not in getting_content):
+                elif (re.search(r'(\.*\d+\.*)*<\w', each_garb)) and (each_garb not in getting_content):
                     getting_content.append(each_garb)
-                elif (re.search(r'\s*\.*\d+\.*\s*$', each_garb)) and (each_garb not in getting_content):
-                    getting_content.append(each_garb)
-                elif (re.search(r'^\s*\.*\d+\.*\s*$', each_garb)) and (each_garb not in getting_content):
-                    getting_content.append(each_garb)
-                elif (re.search(r'^\s*\.*\d+\.*\s*', each_garb)) and (each_garb not in getting_content):
-                    getting_content.append(each_garb)
-                elif (re.search(r'\s*\.*\d+\.*\s', each_garb)) and (each_garb not in getting_content):
+                elif (re.search(r'^\s*(\.*\d+\.*)*\s*$', each_garb)) and (each_garb not in getting_content):
                     getting_content.append(each_garb)
                 else:
                     pass
@@ -126,10 +120,16 @@ def get_ip(garbage, span, div, clear_elem):
     all_part_ip = list()
 
     for ip_part in cont_ip:
-        all_part_ip.append(ip_part[1])
+        try:
+            all_part_ip.append(ip_part[1])
+        except IndexError:
+            all_part_ip.append(ip_part[0])
 
     list_ip_vs_sym = list(map(lambda e: re.split(r'[><.]+', e), all_part_ip))
     clear_ip = list(filter(None, reduce(lambda x, y: x + y, list_ip_vs_sym)))
 
-    ip = '.'.join(clear_ip)
+    if len(clear_ip) != 4:
+        ip = 'wrong ip'
+    else:
+        ip = '.'.join(clear_ip)
     return ip
